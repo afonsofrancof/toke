@@ -1,0 +1,10 @@
+[vars]
+cc = "gcc"
+
+[targets.build]
+cmd = "${cc} main.c -o main"
+
+[targets.run]
+cmd = "./main arg1 arg2"
+deps = ["build"]
+
