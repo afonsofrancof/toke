@@ -113,33 +113,7 @@ fn main() {
         eprintln!("Target '{}' not found in tokefile", target);
         exit(1);
     }
-
-    //Run deps
-    run_deps(&parsed_toml, target.to_string());
-
-    if parsed_toml
-        .get("targets")
-        .and_then(|targets| targets.get(target))
-        .and_then(|target| target.as_table())
-        .and_then(|target| target.get("wildcards"))
-        .is_some()
-    {
-        let command_list = wildcard_iterations(&parsed_toml, target.to_string());
-        for cmd in command_list {
-            run_command(&cmd);
-        }
-        exit(0);
-    } else {
-        run_command(
-            parsed_toml
-                .get("targets")
-                .and_then(|targets| targets.get(target))
-                .and_then(|target| target.as_table())
-                .and_then(|target| target.get("cmd"))
-                .and_then(|cmd| cmd.as_str())
-                .unwrap_or(""),
-        );
-    }
+    run_target(&parsed_toml, target.to_string());
 }
 fn detect_cycle(parsed_toml: &toml::Value) {
     let mut visited_targets = HashSet::new();
@@ -403,6 +377,38 @@ fn wildcard_iterations(parsed_toml: &toml::Value, target: String) -> Vec<String>
     command_list
 }
 
+fn run_target(parsed_toml: &toml::Value, target: String) {
+    run_deps(parsed_toml, target.clone());
+    run_wildcards_or_cmd(parsed_toml, target.clone());
+}
+
+fn run_wildcards_or_cmd(parsed_toml: &toml::Value, target: String) {
+    if parsed_toml
+        .clone()
+        .get("targets")
+        .and_then(|targets| targets.get(target.to_string()))
+        .and_then(|target| target.as_table())
+        .and_then(|target| target.get("wildcards"))
+        .is_some()
+    {
+        let command_list = wildcard_iterations(parsed_toml, target.to_string());
+        for cmd in command_list {
+            run_command(&cmd);
+        }
+    } else {
+        run_command(
+            parsed_toml
+                .clone()
+                .get("targets")
+                .and_then(|targets| targets.get(target))
+                .and_then(|target| target.as_table())
+                .and_then(|target| target.get("cmd"))
+                .and_then(|cmd| cmd.as_str())
+                .unwrap_or(""),
+        );
+    }
+}
+
 fn run_deps(parsed_toml: &toml::Value, target: String) {
     if let Some(targets) = parsed_toml
         .get("targets")
@@ -413,7 +419,7 @@ fn run_deps(parsed_toml: &toml::Value, target: String) {
                 if let Some(dep_array) = dep_value.as_array() {
                     for dep in dep_array {
                         if let Some(dep_str) = dep.as_str() {
-                            run_deps(parsed_toml, dep_str.to_string());
+                            run_target(parsed_toml, dep_str.to_string());
                         }
                     }
                 }
