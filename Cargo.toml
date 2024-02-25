@@ -1,7 +1,7 @@
 [package]
 name = "toke-runner"
 description = "A command runner for toml files"
-repository = "https://git.olympuslab.net/afonso/toke"
+repository = "https://github.com/afonsofrancof/toke"
 readme = "README.md"
 keywords = ["cli", "toml", "command", "runner", "toke"]
 categories = ["command-line-utilities", "development-tools"]
