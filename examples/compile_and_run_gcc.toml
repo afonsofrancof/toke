@@ -2,6 +2,7 @@
 cc = "gcc"
 
 [targets.build]
+vars.cc = "gcc"
 cmd = "${cc} main.c -o main"
 
 [targets.run]
