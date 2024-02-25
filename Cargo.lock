@@ -214,7 +214,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "toke"
+name = "toke-runner"
 version = "0.1.0"
 dependencies = [
  "clap",
