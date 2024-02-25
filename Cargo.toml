@@ -5,7 +5,7 @@ repository = "https://github.com/afonsofrancof/toke"
 readme = "README.md"
 keywords = ["cli", "toml", "command", "runner", "toke"]
 categories = ["command-line-utilities", "development-tools"]
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 
