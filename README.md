@@ -3,6 +3,24 @@
 Toke (TOML Make) is a simple command runner inspired by Make but uses TOML (Tom's Obvious, Minimal Language) instead of Makefiles.
 This project was created for fun as an alternative to Make, because I was looking for a simple command runner/build system but didn't like the Makefile syntax.
 
+# Installing toke
+
+You can get toke from crates.io:
+
+```sh
+cargo install toke-runner
+```
+
+You can also manually compile it with cargo:
+
+```sh
+git clone https://git.olympuslab.net/afonso/toke
+cd toke
+cargo build --release
+```
+
+The executable should then be in `target/release/toke`
+
 # How to use toke
 
 Toke works by reading a TOML file named `tokefile.toml` (or any variation of it like `Tokefile.toml`, `tokefile`, etc.) in your project directory. This file contains definitions of variables, targets, and their respective commands.
