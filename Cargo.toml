@@ -1,7 +1,13 @@
 [package]
 name = "toke"
+description = "A command runner for toml files"
+repository = "https://git.olympuslab.net/afonso/toke"
+readme = "README.md"
+keywords = ["cli", "toml", "command", "runner", "toke"]
+categories = ["command-line-utilities", "development-tools"]
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
