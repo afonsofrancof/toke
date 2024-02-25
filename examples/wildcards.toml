@@ -1,0 +1,11 @@
+[vars]
+CC="!which gcc"
+CFLAGS="-Wall -O2 -I/opt/homebrew/opt/openssl@3.2/include -L/opt/homebrew/opt/openssl@3.2/lib"
+LDFLAGS="-lssl -lcrypto"
+
+[targets.build]
+# This makes use of the wildcards feature to generate a list of source files and output files
+# and compiles each source file to an output file
+wildcards=["!ls -1 src/*.c","!ls -1 src/*.c | sed -e 's/\\.c$//' | sed -e 's/^src/bin/'"]
+cmd="${CC} ${CFLAGS} ${LDFLAGS} @@ -o @@"
+
