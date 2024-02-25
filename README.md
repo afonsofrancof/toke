@@ -3,9 +3,27 @@
 Toke (TOML Make) is a simple command runner inspired by Make but uses TOML (Tom's Obvious, Minimal Language) instead of Makefiles.
 This project was created for fun as an alternative to Make, because I was looking for a simple command runner/build system but didn't like the Makefile syntax.
 
-# How to Use Toke
+# How to use toke
 
 Toke works by reading a TOML file named `tokefile.toml` (or any variation of it like `Tokefile.toml`, `tokefile`, etc.) in your project directory. This file contains definitions of variables, targets, and their respective commands.
+
+You can also pass in a file to be used instead of the default one.
+
+```sh
+toke -f my_custom_named_toke_file
+```
+
+To run a toke target, just run `toke target_name_here`
+
+For example:
+
+```sh
+toke build
+```
+
+Toke then reads the TOML file, resolves variables, and then executes the specified commands for the target you provide.
+
+It also checks for dependency cycles in your targets to prevent infinite loops.
 
 ## Example Tokefile
 
@@ -14,6 +32,7 @@ Toke works by reading a TOML file named `tokefile.toml` (or any variation of it 
 cc = "gcc"
 
 [targets.build]
+vars.cc = "clang"
 cmd = "${cc} main.c -o main"
 
 [targets.run]
@@ -32,6 +51,9 @@ You can write your TOML file in any way you wish as long as it's structure is in
   },
   "targets": {
     "build": {
+      "vars": {
+        "cc": "clang"
+      },
       "cmd": "${cc} main.c -o main"
     },
     "run": {
@@ -48,22 +70,65 @@ We define a variable `cc` which is set to `"gcc"`.
 
 We have two targets: `build` and `run`.
 
-The `build` target compiles the code with gcc.
+The `build` target compiles the code with clang.
 
 The `run` target runs the code with some arguments. It also depends on the `build` target.
 
-To run a specific target, simply pass its name as an argument when running the Toke program.
+# Variables
 
+## Global variables
+
+You can define global variables in the vars table, as seen in the above example.
+
+## Local variables
+
+You can specify local variables for each target. These local variables are defined under the `vars` key within each target section. If the local variable name matches a global variable, it will overwrite the global variable value for that specific target.
+
+Here is an example:
+
+```toml
+[vars]
+cc = "g++"
+
+[target.target1]
+vars.cc = "gcc"
+cmd="${cc} ${cflags} main.c -o main"
+
+[target.target2]
+vars.cc = "clang"
+vars.cflags = "-Wall"
+cmd="${cc} ${cflags} main.c -o main"
+
+[target.target3]
+vars.cflags = "-O3"
+cmd="${cc} ${cflags} main.c -o main"
 ```
-$ ./toke build
-gcc main.c -o main
+
+In this example:
+
+`target1` uses `gcc` for the `cc` variable, overriding the global value.
+
+`target2` specifies `clang` for the `cc` variable and adds `-Wall` to `cflags`.
+
+`target3` only sets `cflags` to `-O3`.
+
+## Command line overrides
+
+Additionally, you can override both global and local variables via command line arguments when invoking `toke`. Command line arguments follow the format `VARIABLE=value`. When provided, these values will overwrite any corresponding global or local variables.
+
+Here's an example of using command line arguments:
+
+```sh
+toke build CC=gcc CFLAGS=-O2
 ```
 
-# How Toke Works
+In this example:
 
-Toke reads the TOML file, resolves variables, and then executes the specified commands for the target you provide.
+`CC=gcc` overrides the value of the `cc` variable.
 
-It also checks for dependency cycles in your targets to prevent infinite loops.
+`CFLAGS=-O2` overrides the value of the `cflags` variable.
+
+These overrides allow for flexible customization.
 
 # Contributing
 
