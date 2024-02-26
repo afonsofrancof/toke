@@ -197,6 +197,22 @@ fn replace_variables(parsed_toml: &mut toml::Value, cli_vars: HashMap<String, St
                 merged_vars.insert(key.clone(), toml::Value::String(value.clone()));
             }
 
+            //If a variable is a command, execute it and use the output as the variable value
+            for (_key, value) in merged_vars.iter_mut() {
+                if let Some(value_str) = value.as_str() {
+                    if let Some(stripped_command) = value_str.strip_prefix('!') {
+                        let output = Command::new("sh")
+                            .arg("-c")
+                            .arg(stripped_command)
+                            .output()
+                            .expect("Failed to execute shell command");
+                        *value = toml::Value::String(
+                            String::from_utf8_lossy(&output.stdout).trim().to_string(),
+                        );
+                    }
+                }
+            }
+
             //Replace variables in the target's wildcards value
             if let Some(wildcards_value) = target_table.get_mut("wildcards") {
                 if let Some(wildcards_array) = wildcards_value.as_array_mut() {
